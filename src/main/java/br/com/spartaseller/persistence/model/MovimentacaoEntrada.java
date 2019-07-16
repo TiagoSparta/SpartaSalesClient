@@ -1,5 +1,7 @@
 package br.com.spartaseller.persistence.model;
 
+import br.com.spartaseller.persistence.observable.MovimentacaoEntradaObservable;
+
 public class MovimentacaoEntrada extends AbstractEntity{
     private Entrada entrada;
     private Produto produto;
@@ -14,6 +16,11 @@ public class MovimentacaoEntrada extends AbstractEntity{
         this.produto = produto;
         this.valorUnitarioAtual = valorUnitarioAtual;
         this.quantidade = quantidade;
+    }
+
+    public MovimentacaoEntrada(MovimentacaoEntradaObservable observable){
+        id = observable.getId();
+        quantidade = observable.getQuantidade();
     }
 
     public Entrada getEntrada() {

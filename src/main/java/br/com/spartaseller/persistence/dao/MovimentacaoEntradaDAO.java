@@ -58,7 +58,7 @@ public class MovimentacaoEntradaDAO {
 
     public List<MovimentacaoEntrada> saveAll(List<MovimentacaoEntrada> movimentacaoEntradaList, String token) {
         ResponseEntity<List<MovimentacaoEntrada>> exchange =
-                restTemplate.exchange(BASE_URL, HttpMethod.POST, new HttpEntity<>(movimentacaoEntradaList, createJSONHeader(token)), new ParameterizedTypeReference<List<MovimentacaoEntrada>>() {
+                restTemplate.exchange(BASE_URL + "/saveAll", HttpMethod.POST, new HttpEntity<>(movimentacaoEntradaList, createJSONHeader(token)), new ParameterizedTypeReference<List<MovimentacaoEntrada>>() {
                 });
         return exchange.getBody();
     }

@@ -4,7 +4,7 @@ import br.com.spartaseller.persistence.model.Entrada;
 import br.com.spartaseller.persistence.model.MovimentacaoEntrada;
 import br.com.spartaseller.persistence.model.Produto;
 import br.com.spartaseller.persistence.observable.EntradaObservable;
-import br.com.spartaseller.persistence.observable.MovimendacaoEntradaObservable;
+import br.com.spartaseller.persistence.observable.MovimentacaoEntradaObservable;
 import br.com.spartaseller.persistence.observable.ProdutoObservable;
 
 import java.util.ArrayList;
@@ -21,10 +21,10 @@ public class Conversor {
         return list;
     }
 
-    public static List<MovimendacaoEntradaObservable> converterMovimentacaoEntrada(List<MovimentacaoEntrada> movimentacaoEntradaList) {
-        List<MovimendacaoEntradaObservable> list = new ArrayList<>();
+    public static List<MovimentacaoEntradaObservable> converterMovimentacaoEntrada(List<MovimentacaoEntrada> movimentacaoEntradaList) {
+        List<MovimentacaoEntradaObservable> list = new ArrayList<>();
         for (MovimentacaoEntrada movimentacao : movimentacaoEntradaList) {
-            MovimendacaoEntradaObservable observable = new MovimendacaoEntradaObservable(movimentacao);
+            MovimentacaoEntradaObservable observable = new MovimentacaoEntradaObservable(movimentacao);
             list.add(observable);
         }
         return list;
