@@ -41,13 +41,12 @@ public class LoginController {
         stage.close();
 
     }
-    RestTemplate restTemplate = new RestTemplate();
-    LoginDAO loginDAO = new LoginDAO(restTemplate);
+    private RestTemplate restTemplate = new RestTemplate();
+    private LoginDAO loginDAO = new LoginDAO(restTemplate);
 
     @FXML
     void acaoEntrar(ActionEvent event) throws IOException {
         try {
-            txtConexao.setPromptText("Entrando...");
             Token token = loginDAO.loginReturningToken(txtUsuario.getText(), txtPassword.getText());
             if (token != null) {
                 Main.gravarToken(token);

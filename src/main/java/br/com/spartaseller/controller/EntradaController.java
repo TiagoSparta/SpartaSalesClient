@@ -54,8 +54,8 @@ public class EntradaController implements Initializable {
     @FXML
     private Button btBuscar;
 
-    RestTemplate restTemplate = new RestTemplate();
-    EntradaDAO entradaDAO = new EntradaDAO(restTemplate);
+    private RestTemplate restTemplate = new RestTemplate();
+    private EntradaDAO entradaDAO = new EntradaDAO(restTemplate);
 
     private void buscarTodos() {
         List<Entrada> entradas = entradaDAO.listAll(Main.pegarToken());

@@ -26,18 +26,16 @@ public class MovimentacaoEntradaDAO {
         return exchange.getBody();
     }
 
-    public List<MovimentacaoEntrada> findByEntrada(long idEntrada, String token) {
+    public List<MovimentacaoEntrada> findByEntrada(Long idEntrada, String token) {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", token);
         HttpEntity<String> authorization = new HttpEntity<>(headers);
-        ResponseEntity<PageableResponse<MovimentacaoEntrada>> exchange =
-                restTemplate.exchange(
-                        BASE_URL + "/findByEntrada/" + idEntrada,
-                        HttpMethod.GET,
-                        new HttpEntity<>(authorization),
-                        new ParameterizedTypeReference<PageableResponse<MovimentacaoEntrada>>() {
+        int id = Math.toIntExact(idEntrada);
+        ResponseEntity<List<MovimentacaoEntrada>> exchange =
+                restTemplate.exchange(BASE_URL + "/findByEntrada/" + idEntrada,
+                        HttpMethod.GET, authorization, new ParameterizedTypeReference<List<MovimentacaoEntrada>>() {
                 });
-        return exchange.getBody().getContent();
+        return exchange.getBody();
     }
 
     public List<MovimentacaoEntrada> listAll(String token) {
@@ -72,6 +70,13 @@ public class MovimentacaoEntradaDAO {
         ResponseEntity<MovimentacaoEntrada> exchangePost =
                 restTemplate.exchange(BASE_URL + "/" + id, HttpMethod.DELETE, new HttpEntity<>(createJSONHeader(token)), new ParameterizedTypeReference<MovimentacaoEntrada>() {
                 });
+    }
+
+    public List<MovimentacaoEntrada> deleteAll(List<MovimentacaoEntrada> movimentacaoEntradaList, String token) {
+        ResponseEntity<List<MovimentacaoEntrada>> exchange =
+                restTemplate.exchange(BASE_URL + "/deleteAll", HttpMethod.DELETE, new HttpEntity<>(movimentacaoEntradaList, createJSONHeader(token)), new ParameterizedTypeReference<List<MovimentacaoEntrada>>() {
+                });
+        return exchange.getBody();
     }
 
     private static HttpHeaders createJSONHeader(String token) {

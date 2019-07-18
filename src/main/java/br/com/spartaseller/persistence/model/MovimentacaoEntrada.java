@@ -11,6 +11,10 @@ public class MovimentacaoEntrada extends AbstractEntity{
     public MovimentacaoEntrada() {
     }
 
+    public MovimentacaoEntrada(Long id){
+        this.id = id;
+    }
+
     public MovimentacaoEntrada(Entrada entrada, Produto produto, Double valorUnitarioAtual, int quantidade) {
         this.entrada = entrada;
         this.produto = produto;

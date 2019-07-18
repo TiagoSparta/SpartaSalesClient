@@ -17,6 +17,25 @@ public class MovimentacaoEntradaObservable {
     public MovimentacaoEntradaObservable() {
     }
 
+    public MovimentacaoEntradaObservable(Long id, Long entrada) {
+        this.id = new SimpleLongProperty(id);
+        this.entrada = new SimpleLongProperty(entrada);
+        this.produto = new SimpleStringProperty("");
+        this.valorUnitarioAtual = new SimpleDoubleProperty(0D);
+        this.quantidade = new SimpleIntegerProperty(0);
+        this.valorTotal = new SimpleDoubleProperty(0D);
+
+    }
+
+    public MovimentacaoEntradaObservable(Long id, Long entrada, String produto, Double valorUnitarioAtual, Integer quantidade, Double valorTotal) {
+        this.id = new SimpleLongProperty(id);
+        this.entrada = new SimpleLongProperty(entrada);
+        this.produto = new SimpleStringProperty(produto);
+        this.valorUnitarioAtual = new SimpleDoubleProperty(valorUnitarioAtual);
+        this.quantidade = new SimpleIntegerProperty(quantidade);
+        this.valorTotal = new SimpleDoubleProperty(valorTotal);
+    }
+
     public MovimentacaoEntradaObservable(MovimentacaoEntrada movimentacaoEntrada) {
         id = new SimpleLongProperty(movimentacaoEntrada.getId());
         entrada = new SimpleLongProperty(movimentacaoEntrada.getEntrada().getId());
