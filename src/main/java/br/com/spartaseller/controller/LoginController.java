@@ -6,6 +6,8 @@ import br.com.spartaseller.persistence.model.Token;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import org.springframework.web.client.RestTemplate;
@@ -41,11 +43,11 @@ public class LoginController {
         stage.close();
 
     }
+
     private RestTemplate restTemplate = new RestTemplate();
     private LoginDAO loginDAO = new LoginDAO(restTemplate);
 
-    @FXML
-    void acaoEntrar(ActionEvent event) throws IOException {
+    private void entrar() {
         try {
             Token token = loginDAO.loginReturningToken(txtUsuario.getText(), txtPassword.getText());
             if (token != null) {
@@ -57,6 +59,17 @@ public class LoginController {
         } catch (Exception e) {
             txtConexao.setPromptText(e.toString());
         }
+    }
 
+    @FXML
+    void acaoEntrar(ActionEvent event) throws IOException {
+        entrar();
+    }
+
+    @FXML
+    void OnKeyPressed(KeyEvent event) {
+        if (event.getCode() == KeyCode.ENTER) {
+            entrar();
+        }
     }
 }

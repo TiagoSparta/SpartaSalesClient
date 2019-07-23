@@ -8,6 +8,8 @@ import br.com.spartaseller.persistence.model.Entrada;
 import br.com.spartaseller.persistence.model.MovimentacaoEntrada;
 import br.com.spartaseller.persistence.model.Produto;
 import br.com.spartaseller.persistence.observable.MovimentacaoEntradaObservable;
+import br.com.spartaseller.util.Alertas;
+import br.com.spartaseller.util.ComponentsModels.ComboBoxAutoComplete;
 import br.com.spartaseller.util.Conversor;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -20,7 +22,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.util.converter.DoubleStringConverter;
 import javafx.util.converter.IntegerStringConverter;
 import org.springframework.web.client.RestTemplate;
@@ -67,6 +68,33 @@ public class MovimentacaoEntradaController implements Initializable {
     @FXML
     private TableColumn<MovimentacaoEntradaObservable, Double> clValorTotal;
 
+    @FXML
+    private Button btAtualizar;
+
+    @FXML
+    private Button btGravar;
+
+    @FXML
+    private Button btDeletarItem;
+
+    @FXML
+    private Button btAdicionar;
+
+    @FXML
+    private Label lbProdutoCB;
+
+    @FXML
+    private ComboBox<String> cbProduto;
+
+    @FXML
+    private TextField txtQuantidade;
+
+    @FXML
+    private TextField txtValorUnit;
+
+    @FXML
+    private Label lbFechar;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         carregarVariaveisGerais();
@@ -85,6 +113,7 @@ public class MovimentacaoEntradaController implements Initializable {
         tbMovEntrada.getSelectionModel().selectFirst();
 
         listarMovimentacoesEntradas();
+        preencherCombobox();
     }
 
     private void setupColunaValorUnitario() {
@@ -99,9 +128,17 @@ public class MovimentacaoEntradaController implements Initializable {
     }
 
     private void setupColunaProduto() {
-        clProduto.setCellValueFactory(new PropertyValueFactory<>("produto"));
+        clProduto.setCellValueFactory(cellData -> cellData.getValue().produtoProperty());
         ObservableList<String> lista = FXCollections.observableArrayList(Conversor.converterProdutoString(produtos));
         clProduto.setCellFactory(ComboBoxTableCell.forTableColumn(lista));
+    }
+
+    private void preencherCombobox() {
+        cbProduto.setTooltip(new Tooltip());
+        ObservableList<String> lista = FXCollections.observableArrayList(Conversor.converterProdutoString(produtos));
+        cbProduto.setItems(lista);
+        new ComboBoxAutoComplete<>(cbProduto);
+
     }
 
     @FXML
@@ -129,6 +166,7 @@ public class MovimentacaoEntradaController implements Initializable {
                 addRow();
             } else if (pos.getRow() < tbMovEntrada.getItems().size() - 1) {
                 tbMovEntrada.getSelectionModel().clearAndSelect(pos.getRow() + 1, pos.getTableColumn());
+
             }
         }
     }
@@ -157,6 +195,27 @@ public class MovimentacaoEntradaController implements Initializable {
         tbMovEntrada.scrollTo(data);
     }
 
+    @FXML
+    void cbProdKeyPress(KeyEvent event) {
+        if (event.getCode() == KeyCode.ENTER) {
+            txtQuantidade.requestFocus();
+        }
+    }
+
+    @FXML
+    void txtQuantKeyPress(KeyEvent event) {
+        if (event.getCode() == KeyCode.ENTER) {
+            txtValorUnit.requestFocus();
+        }
+    }
+
+    @FXML
+    void txtValUnitKeyPress(KeyEvent event) {
+        if (event.getCode() == KeyCode.ENTER) {
+            btAdicionar.requestFocus();
+        }
+    }
+
     private Optional<Produto> pegarProdutoByNome(String nome) {
         return produtos.stream().filter(produto -> produto.getNome().equals(nome)).findFirst();
     }
@@ -177,8 +236,9 @@ public class MovimentacaoEntradaController implements Initializable {
                                 novoProd,
                                 itemTabela.getValorUnitarioAtual(),
                                 itemTabela.getQuantidade()));
+                        break;
                     } else {
-                        alertWarning("Produto não encontrado",
+                        Alertas.alertWarning("Produto não encontrado",
                                 "Nenhuma alteração foi salva",
                                 "Verifique o produto de ID " + itemTabela.getId());
                         return null;
@@ -194,7 +254,7 @@ public class MovimentacaoEntradaController implements Initializable {
                         if (produto.isPresent()) {
                             itemBanco.setProduto(produto.get());
                         } else {
-                            alertWarning("Produto não encontrado",
+                            Alertas.alertWarning("Produto não encontrado",
                                     "Nenhuma alteração foi salva",
                                     "Verifique o produto de ID " + itemTabela.getId());
                             return null;
@@ -220,7 +280,7 @@ public class MovimentacaoEntradaController implements Initializable {
     private void aplicarAlteracoes(List<MovimentacaoEntrada> itensAlterados) {
         try {
             movEntrDAO.saveAll(itensAlterados, token);
-            alertInformation("Banco atualizado",
+            Alertas.alertInformation("Banco atualizado",
                     "Alterações realizadas!",
                     "Todas as " + itensAlterados.size() + " alterações foram realizadas com sucesso.");
         } catch (
@@ -236,7 +296,7 @@ public class MovimentacaoEntradaController implements Initializable {
             itensParaDeletar.add(new MovimentacaoEntrada(item.getId()));
         }
 
-        Boolean isSim = alertConfirmationSimCalcelar("Excluir itens",
+        Boolean isSim = Alertas.alertConfirmationSimCalcelar("Excluir itens",
                 "Foram excluídos " + itensParaDeletar.size() + " itens da tabela.",
                 "Tem certeza que deseja excluí-los?");
 
@@ -248,7 +308,7 @@ public class MovimentacaoEntradaController implements Initializable {
     private void excluirVarios(List<MovimentacaoEntrada> itensDeletados) {
         try {
             movEntrDAO.deleteAll(itensDeletados, token);
-            alertInformation("Banco atualizado",
+            Alertas.alertInformation("Banco atualizado",
                     "Os itens foram deletados!",
                     "Todos os " + itensDeletados.size() + " itens foram deletados com sucesso.");
             tbMovEntrada.getItems().removeAll(tbMovEntrada.getSelectionModel().getSelectedItems());
@@ -259,30 +319,40 @@ public class MovimentacaoEntradaController implements Initializable {
         }
     }
 
-    @FXML
-    private Button btAtualizar;
+    private void addItemPrenchido() {
+        if (cbProduto.getValue().isEmpty() || cbProduto.getValue() == null) {
+            Alertas.alertInformation("Dados incompletos",
+                    "Produto não preenchido!",
+                    "Favor indicar o produto antes de adicionar a movimentação.");
+        } else if (txtQuantidade.getText().isEmpty() || txtQuantidade.getText() == null) {
+            Alertas.alertInformation("Dados incompletos",
+                    "Quantidade não preenchida!",
+                    "Favor indicar a quantidade antes de adicionar a movimentação.");
+        } else if (txtValorUnit.getText().isEmpty() || txtValorUnit.getText() == null) {
+            Alertas.alertInformation("Dados incompletos",
+                    "Valor Unitário não preenchida!",
+                    "Favor indicar o valor unitário antes de adicionar a movimentação.");
+        } else {
+            TablePosition pos = tbMovEntrada.getFocusModel().getFocusedCell();
+            tbMovEntrada.getSelectionModel().clearSelection();
+            Double valorUnitario = new DoubleStringConverter().fromString(txtValorUnit.getText());
+            Integer quantidade = new IntegerStringConverter().fromString(txtQuantidade.getText());
+            MovimentacaoEntradaObservable data = new MovimentacaoEntradaObservable(idGeral, idGeral,
+                    cbProduto.getValue(),
+                    valorUnitario,
+                    quantidade,
+                    (valorUnitario * quantidade));
+            tbMovEntrada.getItems().add(data);
 
-    @FXML
-    private Button btGravar;
-
-    @FXML
-    private Button btDeletarItem;
-
-    @FXML
-    private Button btAdicionar;
-
-    @FXML
-    private Label lbProdutoCB;
-
-    @FXML
-    private ComboBox<String> cbProduto;
-
-    @FXML
-    private Label lbFechar;
+            int row = tbMovEntrada.getItems().size() - 1;
+            tbMovEntrada.getSelectionModel().select(row, pos.getTableColumn());
+            tbMovEntrada.scrollTo(data);
+        }
+    }
 
     @FXML
     void adicionarItem(ActionEvent event) {
-//        adicionarMovimentacaoEntrada();
+
         listarMovimentacoesEntradas();
     }
 
@@ -292,58 +362,19 @@ public class MovimentacaoEntradaController implements Initializable {
     }
 
     @FXML
-    void cbProdutoClick(MouseEvent event) {
-
-    }
-
-    @FXML
     void deletarItem(ActionEvent event) {
-
+//        excluirVarios();
     }
 
     @FXML
     void gravarAlteracoes(ActionEvent event) {
         List<MovimentacaoEntrada> itensAlterados = verificarItensAlterados();
-        Boolean isSim = alertConfirmationSimCalcelar("Gravar alterações",
-                "Foram encontrados \" + itensAlterados.size() + \" itens alterados..",
+        Boolean isSim = Alertas.alertConfirmationSimCalcelar("Gravar alterações",
+                "Foram encontrados " + itensAlterados.size() + " itens alterados..",
                 "Tem certeza que deseja gravar?");
         if (isSim) {
             aplicarAlteracoes(itensAlterados);
         }
     }
 
-    private void alertWarning(String titulo, String header, String content) {
-        Alert dialogoAviso = new Alert(Alert.AlertType.WARNING);
-        dialogoAviso.setTitle(titulo);
-        dialogoAviso.setHeaderText(header);
-        dialogoAviso.setContentText(content);
-        dialogoAviso.showAndWait();
-    }
-
-    private void alertInformation(String titulo, String header, String content) {
-        Alert dialogoInfo = new Alert(Alert.AlertType.INFORMATION);
-        dialogoInfo.setTitle(titulo);
-        dialogoInfo.setHeaderText(header);
-        dialogoInfo.setContentText(content);
-        dialogoInfo.showAndWait();
-    }
-
-    private static boolean clicouEmSim = false;
-
-    private Boolean alertConfirmationSimCalcelar(String titulo, String header, String content) {
-        clicouEmSim = false;
-        Alert confirmacaoGravarExclusao = new Alert(Alert.AlertType.CONFIRMATION);
-        ButtonType btnSim = new ButtonType("Sim");
-        ButtonType btnCancelar = new ButtonType("Cancelar", ButtonBar.ButtonData.CANCEL_CLOSE);
-        confirmacaoGravarExclusao.setTitle(titulo);
-        confirmacaoGravarExclusao.setHeaderText(header);
-        confirmacaoGravarExclusao.setContentText(content);
-        confirmacaoGravarExclusao.getButtonTypes().setAll(btnSim, btnCancelar);
-        confirmacaoGravarExclusao.showAndWait().ifPresent(b -> {
-            if (b == btnSim) {
-                clicouEmSim = true;
-            }
-        });
-        return clicouEmSim;
-    }
 }

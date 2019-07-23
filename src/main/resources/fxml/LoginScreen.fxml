@@ -45,7 +45,7 @@
                   <Font size="14.0" />
                </font>
             </TextField>
-            <PasswordField fx:id="txtPassword" prefHeight="32.0" prefWidth="227.0" style="-fx-border-color: #9643A9; -fx-background-color: #2A0033; -fx-background-insets: 0; -fx-border-radius: 20; -fx-text-fill: #fff;" GridPane.columnIndex="2" GridPane.rowIndex="1">
+            <PasswordField fx:id="txtPassword" onKeyPressed="#OnKeyPressed" prefHeight="32.0" prefWidth="227.0" style="-fx-border-color: #9643A9; -fx-background-color: #2A0033; -fx-background-insets: 0; -fx-border-radius: 20; -fx-text-fill: #fff;" GridPane.columnIndex="2" GridPane.rowIndex="1">
                <font>
                   <Font size="14.0" />
                </font>

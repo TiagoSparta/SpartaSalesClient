@@ -2,9 +2,12 @@ package br.com.spartaseller.controller;
 
 import br.com.spartaseller.Main;
 import br.com.spartaseller.persistence.dao.EntradaDAO;
+import br.com.spartaseller.persistence.dao.MovimentacaoEntradaDAO;
 import br.com.spartaseller.persistence.model.ApplicationUser;
 import br.com.spartaseller.persistence.model.Entrada;
+import br.com.spartaseller.persistence.model.MovimentacaoEntrada;
 import br.com.spartaseller.persistence.observable.EntradaObservable;
+import br.com.spartaseller.util.Alertas;
 import br.com.spartaseller.util.Conversor;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -56,9 +59,11 @@ public class EntradaController implements Initializable {
 
     private RestTemplate restTemplate = new RestTemplate();
     private EntradaDAO entradaDAO = new EntradaDAO(restTemplate);
+    MovimentacaoEntradaDAO movimentacaoEntradaDAO = new MovimentacaoEntradaDAO(restTemplate);
+    String token = Main.pegarToken();
 
     private void buscarTodos() {
-        List<Entrada> entradas = entradaDAO.listAll(Main.pegarToken());
+        List<Entrada> entradas = entradaDAO.listAll(token);
         List<EntradaObservable> entradaObsComum = Conversor.converterEntrada(entradas);
         ObservableList<EntradaObservable> listaEntradas = FXCollections.observableArrayList(entradaObsComum);
         tbEntrada.setItems(listaEntradas);
@@ -73,10 +78,15 @@ public class EntradaController implements Initializable {
     private Button btAdicionar;
 
     private void adicionarEntrada() {
-        Entrada entrada = new Entrada();
-        entrada.setDataHoraInicio(LocalDateTime.now());
-        entrada.setTipo("COMPRA");
-        entradaDAO.save(entrada, Main.pegarToken());
+        Boolean adicionar = Alertas.alertConfirmationSimCalcelar("Nova Entrada",
+                "Adicionar nova Entrada.",
+                "Tem certeza que deseja adicionar uma nova Entrada?");
+        if (adicionar) {
+            Entrada entrada = new Entrada();
+            entrada.setDataHoraInicio(LocalDateTime.now());
+            entrada.setTipo("COMPRA");
+            entradaDAO.save(entrada, token);
+        }
     }
 
     @FXML
@@ -89,11 +99,40 @@ public class EntradaController implements Initializable {
     private Button btRemover;
 
     private void removerEntradaSelecionada() {
-        EntradaObservable linha = tbEntrada.getSelectionModel().getSelectedItem();
-        try {
-            entradaDAO.delete(linha.getId(), Main.pegarToken());
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (tbEntrada.getSelectionModel().getSelectedItem() != null) {
+            try {
+                List<MovimentacaoEntrada> movimentEntrada = movimentacaoEntradaDAO.findByEntrada(
+                        tbEntrada.getSelectionModel().getSelectedItem().getId(), token);
+                if (movimentEntrada.size() > 0) {
+                    Boolean excluirTudo = Alertas.alertConfirmationSimCalcelar(
+                            "Excluir Entrada e Movimentações?",
+                            "Foram encontradas movimentações para a entrada selecionada!",
+                            "Tem certeza que deseja excluir a entrada selecionada e todas as suas movimentações?");
+                    if (excluirTudo) {
+                        movimentacaoEntradaDAO.deleteAll(movimentEntrada, token);
+                        entradaDAO.delete(tbEntrada.getSelectionModel().getSelectedItem().getId(), token);
+                    }
+                } else {
+                    Boolean excluirEntrada = Alertas.alertConfirmationSimCalcelar(
+                            "Excluir Entrada?",
+                            "Foram encontradas movimentações para a entrada selecionada!",
+                            "Tem certeza que deseja excluir a entrada selecionada?");
+                    if (excluirEntrada) {
+                        entradaDAO.delete(tbEntrada.getSelectionModel().getSelectedItem().getId(), token);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                Alertas.alertWarning(
+                        "Erro",
+                        "Houve um erro",
+                        e.getMessage());
+            }
+        } else {
+            Alertas.alertInformation(
+                    "Impossível excluir",
+                    "Nenhum item foi selecionado.",
+                    "Selecione um item para excluir.");
         }
     }
 

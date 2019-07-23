@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import br.com.spartaseller.util.ComponentsModels.NumberTextField?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -37,9 +38,75 @@
                         <Font name="System Bold" size="18.0" />
                     </font>
                 </Label>
-                <HBox prefHeight="100.0" prefWidth="200.0" GridPane.rowIndex="1">
+                <HBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="119.0" prefWidth="1023.0" GridPane.rowIndex="1">
                     <children>
-                        <VBox minHeight="-Infinity" minWidth="-Infinity" prefHeight="110.0" prefWidth="160.0">
+                  <VBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="110.0" prefWidth="300.0">
+                     <children>
+                        <Label text="Produto">
+                           <VBox.margin>
+                              <Insets left="10.0" right="10.0" top="10.0" />
+                           </VBox.margin></Label>
+                        <ComboBox fx:id="cbProduto" onKeyPressed="#cbProdKeyPress" prefHeight="25.0" prefWidth="283.0">
+                           <VBox.margin>
+                              <Insets bottom="10.0" left="10.0" right="10.0" />
+                           </VBox.margin></ComboBox>
+                     </children>
+                  </VBox>
+                  <VBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="110.0" prefWidth="100.0">
+                     <children>
+                        <Label text="Quantidade">
+                           <VBox.margin>
+                              <Insets left="10.0" right="10.0" top="10.0" />
+                           </VBox.margin>
+                        </Label>
+                        <NumberTextField fx:id="txtQuantidade" onKeyPressed="#txtQuantKeyPress">
+                           <VBox.margin>
+                              <Insets left="10.0" right="10.0" />
+                           </VBox.margin>
+                        </NumberTextField>
+                     </children>
+                  </VBox>
+                        <VBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="110.0" prefWidth="100.0">
+                            <children>
+                        <Label text="Valor Unitário">
+                           <VBox.margin>
+                              <Insets left="10.0" right="10.0" top="10.0" />
+                           </VBox.margin>
+                        </Label>
+                        <TextField fx:id="txtValorUnit" onKeyPressed="#txtValUnitKeyPress">
+                           <VBox.margin>
+                              <Insets left="10.0" right="10.0" />
+                           </VBox.margin>
+                        </TextField>
+                            </children>
+                            <HBox.margin>
+                                <Insets />
+                            </HBox.margin>
+                        </VBox>
+                  <VBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="110.0" prefWidth="100.0">
+                     <children>
+                                <Button fx:id="btAdicionar" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#adicionarItem" text="Adicionar">
+                           <VBox.margin>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="25.0" />
+                           </VBox.margin>
+                                </Button>
+                     </children>
+                  </VBox>
+                  <VBox layoutX="10.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="110.0" prefWidth="160.0">
+                     <children>
+                        <Button fx:id="btGravar" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#gravarAlteracoes" prefWidth="140.0" text="Gravar Alterações">
+                           <VBox.margin>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </VBox.margin>
+                        </Button>
+                        <Button fx:id="btDeletarItem" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#deletarItem" prefWidth="140.0" text="Deletar Selecionados">
+                           <VBox.margin>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </VBox.margin>
+                        </Button>
+                     </children>
+                  </VBox>
+                        <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="110.0" prefWidth="160.0">
                             <children>
                                 <Button fx:id="btAtualizar" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#atualizarTabela" prefWidth="140.0" text="Atualizar Tabela">
                            <VBox.margin>
@@ -49,40 +116,6 @@
                      <HBox.margin>
                         <Insets />
                      </HBox.margin>
-                        </VBox>
-                  <VBox layoutX="10.0" layoutY="10.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="110.0" prefWidth="160.0">
-                     <children>
-                        <Button fx:id="btGravar" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#gravarAlteracoes" prefWidth="140.0" text="Gravar Alterações">
-                           <VBox.margin>
-                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                           </VBox.margin>
-                        </Button>
-                        <Button fx:id="btDeletarItem" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#deletarItem" prefWidth="140.0" text="Deletar Movimentação">
-                           <VBox.margin>
-                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                           </VBox.margin>
-                        </Button>
-                     </children>
-                  </VBox>
-                        <VBox prefHeight="110.0" prefWidth="320.0">
-                            <children>
-                                <Button fx:id="btAdicionar" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#adicionarItem" prefWidth="180.0" text="Adicionar Nova Movimentação">
-                           <VBox.margin>
-                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                           </VBox.margin>
-                                </Button>
-                                <Label fx:id="lbProdutoCB" text="Produto" visible="false">
-                           <VBox.margin>
-                              <Insets left="10.0" right="10.0" />
-                           </VBox.margin></Label>
-                                <ComboBox fx:id="cbProduto" onMouseClicked="#cbProdutoClick" prefHeight="25.0" prefWidth="305.0" visible="false">
-                           <VBox.margin>
-                              <Insets left="10.0" right="10.0" />
-                           </VBox.margin></ComboBox>
-                            </children>
-                            <HBox.margin>
-                                <Insets />
-                            </HBox.margin>
                         </VBox>
                     </children>
                 </HBox>
