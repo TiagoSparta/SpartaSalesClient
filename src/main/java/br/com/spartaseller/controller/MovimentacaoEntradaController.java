@@ -10,6 +10,7 @@ import br.com.spartaseller.persistence.model.Produto;
 import br.com.spartaseller.persistence.observable.MovimentacaoEntradaObservable;
 import br.com.spartaseller.util.Alertas;
 import br.com.spartaseller.util.ComponentsModels.ComboBoxAutoComplete;
+import br.com.spartaseller.util.ComponentsModels.EditingDoubleCell;
 import br.com.spartaseller.util.Conversor;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -112,13 +113,14 @@ public class MovimentacaoEntradaController implements Initializable {
         // select first cell
         tbMovEntrada.getSelectionModel().selectFirst();
 
-        listarMovimentacoesEntradas();
+        listarTudo();
         preencherCombobox();
     }
 
     private void setupColunaValorUnitario() {
         clValorUnit.setCellValueFactory(new PropertyValueFactory<>("valorUnitarioAtual"));
-        clValorUnit.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
+        clValorUnit.setCellFactory(col -> new EditingDoubleCell<MovimentacaoEntradaObservable>("valorUnitarioAtual"));
+//        clValorUnit.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
     }
 
     private void setupColunaQuantidade() {
@@ -163,7 +165,7 @@ public class MovimentacaoEntradaController implements Initializable {
             if (pos.getRow() == -1) {
                 tbMovEntrada.getSelectionModel().select(0);
             } else if (pos.getRow() == tbMovEntrada.getItems().size() - 1) {
-                addRow();
+                addLinhaVazia();
             } else if (pos.getRow() < tbMovEntrada.getItems().size() - 1) {
                 tbMovEntrada.getSelectionModel().clearAndSelect(pos.getRow() + 1, pos.getTableColumn());
 
@@ -171,7 +173,7 @@ public class MovimentacaoEntradaController implements Initializable {
         }
     }
 
-    private void listarMovimentacoesEntradas() {
+    private void listarTudo() {
         try {
             tbMovEntrada.getItems().clear();
             tbMovEntrada.setItems(
@@ -183,7 +185,7 @@ public class MovimentacaoEntradaController implements Initializable {
         }
     }
 
-    private void addRow() {
+    private void addLinhaVazia() {
         TablePosition pos = tbMovEntrada.getFocusModel().getFocusedCell();
         tbMovEntrada.getSelectionModel().clearSelection();
 
@@ -193,6 +195,46 @@ public class MovimentacaoEntradaController implements Initializable {
         int row = tbMovEntrada.getItems().size() - 1;
         tbMovEntrada.getSelectionModel().select(row, pos.getTableColumn());
         tbMovEntrada.scrollTo(data);
+    }
+
+    private void addItemPrenchido() {
+        if (cbProduto.getValue().isEmpty() || cbProduto.getValue() == null) {
+            Alertas.alertInformation("Dados incompletos",
+                    "Produto não preenchido!",
+                    "Favor indicar o produto antes de adicionar a movimentação.");
+        } else {
+            Optional<Produto> produto = pegarProdutoByNome(cbProduto.getValue());
+            if (!produto.isPresent()) {
+                Alertas.alertWarning("Produto não encontrado",
+                        "O produto indicado não foi encontrado",
+                        "Preencha corretamente o produto antes de adicionar");
+            } else if (txtQuantidade.getText().isEmpty() || txtQuantidade.getText() == null) {
+                Alertas.alertInformation("Dados incompletos",
+                        "Quantidade não preenchida!",
+                        "Favor indicar a quantidade antes de adicionar a movimentação.");
+            } else if (txtValorUnit.getText().isEmpty() || txtValorUnit.getText() == null) {
+                Alertas.alertInformation("Dados incompletos",
+                        "Valor Unitário não preenchida!",
+                        "Favor indicar o valor unitário antes de adicionar a movimentação.");
+
+            } else {
+                Integer quantidade = new IntegerStringConverter().fromString(txtQuantidade.getText());
+                Double valorUnitario = new DoubleStringConverter().fromString(txtValorUnit.getText());
+
+                MovimentacaoEntradaObservable data = new MovimentacaoEntradaObservable(idGeral, idGeral,
+                        cbProduto.getValue(),
+                        valorUnitario,
+                        quantidade,
+                        (valorUnitario * quantidade));
+
+                tbMovEntrada.getItems().add(data);
+
+                cbProduto.setValue("");
+                txtQuantidade.clear();
+                txtValorUnit.clear();
+                cbProduto.requestFocus();
+            }
+        }
     }
 
     @FXML
@@ -289,7 +331,7 @@ public class MovimentacaoEntradaController implements Initializable {
         }
     }
 
-    public void removeSelectedRows() {
+    public void removerLinhasSelecionadas() {
         List<MovimentacaoEntradaObservable> itensSelecionados = tbMovEntrada.getSelectionModel().getSelectedItems();
         List<MovimentacaoEntrada> itensParaDeletar = new ArrayList<>();
         for (MovimentacaoEntradaObservable item : itensSelecionados) {
@@ -319,51 +361,20 @@ public class MovimentacaoEntradaController implements Initializable {
         }
     }
 
-    private void addItemPrenchido() {
-        if (cbProduto.getValue().isEmpty() || cbProduto.getValue() == null) {
-            Alertas.alertInformation("Dados incompletos",
-                    "Produto não preenchido!",
-                    "Favor indicar o produto antes de adicionar a movimentação.");
-        } else if (txtQuantidade.getText().isEmpty() || txtQuantidade.getText() == null) {
-            Alertas.alertInformation("Dados incompletos",
-                    "Quantidade não preenchida!",
-                    "Favor indicar a quantidade antes de adicionar a movimentação.");
-        } else if (txtValorUnit.getText().isEmpty() || txtValorUnit.getText() == null) {
-            Alertas.alertInformation("Dados incompletos",
-                    "Valor Unitário não preenchida!",
-                    "Favor indicar o valor unitário antes de adicionar a movimentação.");
-        } else {
-            TablePosition pos = tbMovEntrada.getFocusModel().getFocusedCell();
-            tbMovEntrada.getSelectionModel().clearSelection();
-            Double valorUnitario = new DoubleStringConverter().fromString(txtValorUnit.getText());
-            Integer quantidade = new IntegerStringConverter().fromString(txtQuantidade.getText());
-            MovimentacaoEntradaObservable data = new MovimentacaoEntradaObservable(idGeral, idGeral,
-                    cbProduto.getValue(),
-                    valorUnitario,
-                    quantidade,
-                    (valorUnitario * quantidade));
-            tbMovEntrada.getItems().add(data);
-
-            int row = tbMovEntrada.getItems().size() - 1;
-            tbMovEntrada.getSelectionModel().select(row, pos.getTableColumn());
-            tbMovEntrada.scrollTo(data);
-        }
-    }
 
     @FXML
     void adicionarItem(ActionEvent event) {
-
-        listarMovimentacoesEntradas();
+        addItemPrenchido();
     }
 
     @FXML
     void atualizarTabela(ActionEvent event) {
-        listarMovimentacoesEntradas();
+        listarTudo();
     }
 
     @FXML
     void deletarItem(ActionEvent event) {
-//        excluirVarios();
+        removerLinhasSelecionadas();
     }
 
     @FXML
